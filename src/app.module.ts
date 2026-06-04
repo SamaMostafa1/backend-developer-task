@@ -7,6 +7,7 @@ import { MembersModule } from './modules/members/members.module';
 import { ProductsModule } from './modules/products/products.module';
 import { ShopsModule } from './modules/shops/shops.module';
 import { JoiPipeModule } from 'nestjs-joi';
+import { LoggerModule } from './common/logger/logger.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -33,6 +34,7 @@ import { JoiPipeModule } from 'nestjs-joi';
     MembersModule,
     ProductsModule,
     ShopsModule,
+    LoggerModule,
   ],
   controllers: [AppController],
   providers: [AppService],

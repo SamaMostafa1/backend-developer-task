@@ -7,7 +7,8 @@ import { ShopsRepository } from 'src/modules/shops/shops.repository';
 import { ProductsModule } from 'src/modules/products/products.module';
 
 @Module({
-  imports: [SequelizeModule.forFeature([Shop]), ProductsModule],
+  // imports: [SequelizeModule.forFeature([Shop]), ProductsModule],
+  imports: [SequelizeModule.forFeature([Shop])],
   controllers: [ShopsController],
   providers: [ShopsService, ShopsRepository],
   exports: [ShopsService, ShopsRepository],

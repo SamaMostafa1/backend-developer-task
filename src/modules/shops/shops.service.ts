@@ -10,7 +10,7 @@ import { ShopsRepository } from 'src/modules/shops/shops.repository';
 export class ShopsService {
   constructor(
     private readonly repository: ShopsRepository,
-    private readonly productsService: ProductsService,
+    // private readonly productsService: ProductsService,
   ) {}
 
   async create(shop: CreateShopDTO): Promise<ShopDTO> {
@@ -30,16 +30,16 @@ export class ShopsService {
 
     const arr = [];
 
-    for (let i = 0; i < everything.length; i++) {
-      const shop = everything[i];
-      const products = await this.productsService.findWithFilter({
-        shopId: shop.id,
-      });
-      arr.push({
-        ...shop,
-        products,
-      });
-    }
+    // for (let i = 0; i < everything.length; i++) {
+    //   const shop = everything[i];
+    //   const products = await this.productsService.findWithFilter({
+    //     shopId: shop.id,
+    //   });
+    //   arr.push({
+    //     ...shop,
+    //     products,
+    //   });
+    // }
 
     return arr;
   }
