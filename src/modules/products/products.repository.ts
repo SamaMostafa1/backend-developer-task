@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
-import { Op } from 'sequelize';
+import { FindOptions, Op, Sequelize, WhereOptions } from 'sequelize';
 import { Product } from 'src/modules/products/products.model';
 
 @Injectable()
@@ -15,44 +15,33 @@ export class ProductsRepository {
   async findOne(id: string): Promise<Product | null> {
     return this.productModel.findByPk(id);
   }
-  async findWithFilter(filter: Partial<Product>): Promise<Product[]> {
-    return this.productModel.findAll({ where: filter });
+  async findWithFilter(
+    where: WhereOptions<Product>,
+    limit?: number,
+    offset?: number,
+  ): Promise<Product[]> {
+    const queryOptions: FindOptions<Product> = { where };
+    if (limit) queryOptions.limit = limit;
+    if (offset) queryOptions.offset = offset;
+    return this.productModel.findAll(queryOptions);
   }
-  async findWithSearch(options: {
-    search?: string;
-    searchField?: string;
-    page?: number;
-    limit?: number;
-    where?: Partial<Product>;
-  }): Promise<{ rows: Product[]; count: number }> {
-    const { search, searchField, page = 1, limit = 20, where = {} } = options;
 
-    const filter = {
-      ...where,
-      ...(search && searchField
-        ? {
-            [searchField]: {
-              [Op.iLike]: `%${search}%`,
-            },
-          }
-        : {}),
-    };
+  async update(id: string, product: Partial<Product>): Promise<[number, Product[]]> {
+   return this.productModel.update(product, {
+    where: { id },
+    returning: true,
+  });
+}
 
-    return this.productModel.findAndCountAll({
-      where: filter,
-      limit,
-      offset: (page - 1) * limit,
-    });
+  async changeStock(where: WhereOptions<Product>, amount: number) {
+    return this.productModel.update(
+      {
+        stockCount: Sequelize.literal(` stockCount + (${amount})`),
+      },
+      { where },
+    );
   }
-  async update(id: string, product: Partial<Product>): Promise<Product> {
-    const result = await this.productModel.update(product, {
-      where: { id },
-      returning: true,
-    });
-
-    return result[1][0];
-  }
-  async delete(id: string): Promise<void> {
-    await this.productModel.destroy({ where: { id } });
+  async delete(id: string): Promise<number> {
+    return this.productModel.destroy({ where: { id } });
   }
 }

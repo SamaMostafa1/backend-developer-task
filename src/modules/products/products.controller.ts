@@ -1,9 +1,11 @@
-import { Body, Controller, Get, Post, Query } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseUUIDPipe, Patch, Post, Query } from '@nestjs/common';
 import { ProductsService } from './products.service';
 
 import { CreateProductDTO } from './dto/create-product.dto';
 import { ProductDTO } from './dto/product.dto';
 import { AppLogger } from 'src/common/logger/logger';
+import { ProductQueryDto } from './dto/product-query.dto';
+import { updateProductDTO } from './dto/update-product.dto';
 
 @Controller('products')
 export class ProductsController {
@@ -15,22 +17,20 @@ export class ProductsController {
         return this.productsService.create(createProductDto);
       }
       @Get()
-      async findWithFilter(@Query() filter: Partial<ProductDTO>): Promise<ProductDTO[]> {
-        return this.productsService.findWithFilter(filter);
+      async findProducts(@Query() query: ProductQueryDto): Promise<ProductDTO[]> {
+        return this.productsService.findProducts(query);
       }
-    //   @Get('search')
-    //   async search(
-    //     @Query('search') search: string,
-    //     @Query('searchField') searchField: string,
-    //     @Query('page') page: number,
-    //     @Query('limit') limit: number,
-    //   ): Promise<{ rows: ProductDTO[]; count: number }> {
-    //     return this.productsService.findWithSearch({
-    //       search,
-    //       searchField,
-    //       page,
-    //       limit,
-    //     });
-    //   }
+      @Get(':id')
+      async findOne(@Param('id',ParseUUIDPipe) id: string): Promise<ProductDTO> {
+        return this.productsService.findOne(id);
+      }
+     @Patch(':id')
+      async update(@Param('id',ParseUUIDPipe) id: string, @Body() updateProductDto: updateProductDTO): Promise<ProductDTO> {
+        return this.productsService.update(id, updateProductDto);
+      }
+      @Delete(':id')
+      async delete(@Param('id',ParseUUIDPipe) id: string): Promise<void> {
+        return this.productsService.delete(id);
+      }
 
 }
