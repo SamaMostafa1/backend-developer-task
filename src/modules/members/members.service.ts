@@ -7,7 +7,7 @@ import { MembersRepository } from 'src/modules/members/members.repository';
 import { AppLogger } from 'src/common/logger/logger';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
 import { PaginatedResponse } from 'src/common/interfaces/pagination-respones.interface';
-import { Cache } from '@nestjs/cache-manager';
+import { Cache } from 'cache-manager';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 
 
@@ -61,7 +61,6 @@ export class MembersService {
     const page = query.page ?? 1;
     const limit = query.limit ?? 20;
     const offset = (page - 1) * limit;
-    console.log('CACHE INSTANCE:', this.cacheManager);
     const cacheKey = `members:page=${page}:limit=${limit}`;
 
     const cached =
@@ -87,12 +86,6 @@ export class MembersService {
         limit,
         totalPages: Math.ceil(count / limit),
       };
-      await this.cacheManager.set('test:key', 'hello', 60);
-
-const test = await this.cacheManager.get('test:key');
-console.log('CACHE TEST:', test);
-      // await this.cacheManager.set('debug:key', 'hello');
-
       await this.cacheManager.set(cacheKey, result, 60000);
 
       return result;

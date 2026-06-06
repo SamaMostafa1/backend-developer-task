@@ -9,7 +9,7 @@ import { ShopsModule } from './modules/shops/shops.module';
 import { JoiPipeModule } from 'nestjs-joi';
 import { LoggerModule } from './common/logger/logger.module';
 import { CacheModule } from '@nestjs/cache-manager';
-import KeyvRedis from '@keyv/redis';
+import * as redisStore from 'cache-manager-redis-store';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -35,10 +35,8 @@ import KeyvRedis from '@keyv/redis';
     }),
     CacheModule.register({
       isGlobal: true,
-       stores: [
-        new KeyvRedis('redis://localhost:6379'),
-      ],
-      ttl: 10000, 
+      store: redisStore,
+      url: process.env.REDIS_URL,
     }),
     MembersModule,
     ProductsModule,
