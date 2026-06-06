@@ -21,13 +21,9 @@ export class ShopsRepository {
     return this.shopModel.findAll(queryOptions);
   }
 
-  async findAllWithProducts(limit?: number, offset?: number): Promise<ShopWithProductsDTO[]> {
-    const queryOptions: { limit?: number; offset?: number } = {};
-    if (limit) queryOptions.limit = limit;
-    if (offset) queryOptions.offset = offset;
-
+  async findAllWithProducts(): Promise<ShopWithProductsDTO[]> {
+    
     return this.shopModel.findAll({
-      ...queryOptions,
       include: [
         {
           model: Product,

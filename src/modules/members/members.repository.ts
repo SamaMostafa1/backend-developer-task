@@ -19,16 +19,22 @@ export class MembersRepository {
     return this.memberModel.create(member);
   }
 
-  /**
-   * Fetches all members from the database.
-   *
-   *
-   * @returns {Promise<Member[]>} All members rows.
-   * @throws {Error} If the database query fails.
-   */
-  async findAll(): Promise<Member[]> {
-    return this.memberModel.findAll();
-  }
+/**
+ * Finds all members with pagination
+ * @param limit - Number of members to return per page
+ * @param offset - Number of members to skip
+ * @returns rows (paginated members) and count (total members in DB)
+ * NOTE: count returns the TOTAL number of members in the database,
+ * not just the current page. This is needed to calculate totalPages
+ * on the client side (totalPages = Math.ceil(count / limit)),
+ * so the client knows when to stop fetching pages.
+ */
+ async findAll(limit: number, offset: number): Promise<{ rows: Member[], count: number }> {
+  return this.memberModel.findAndCountAll({
+    limit,
+    offset,
+  });
+}
 
   /**
    * Fetches a single member by ID.
@@ -65,7 +71,7 @@ export class MembersRepository {
    * @returns {Promise<void>} Resolves when the delete query finishes.
    * @throws {Error} If the database delete fails.
    */
-  async delete(id: string): Promise<void> {
-    await this.memberModel.destroy({ where: { id } });
+  async delete(id: string): Promise<number> {
+    return await this.memberModel.destroy({ where: { id } });
   }
 }

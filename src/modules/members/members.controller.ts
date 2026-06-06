@@ -6,11 +6,14 @@ import {
   Param,
   Body,
   Patch,
+  Query,
 } from '@nestjs/common';
 import { MembersService } from './members.service';
 import { CreateMemberDTO } from './dto/create-member.dto';
 import { UpdateMemberDTO } from './dto/update-member.dto';
 import { MemberDTO } from './dto/member.dto';
+import { PaginationDto } from 'src/common/dto/pagination.dto';
+import { PaginatedResponse } from 'src/common/interfaces/pagination-respones.interface';
 
 @Controller('members')
 export class MembersController {
@@ -22,8 +25,8 @@ export class MembersController {
   }
 
   @Get()
-  async findAll(): Promise<MemberDTO[]> {
-    return this.membersService.findAll();
+  async findAll(@Query() query:PaginationDto ): Promise<PaginatedResponse<MemberDTO>> {
+    return this.membersService.findAll(query);
   }
 
   @Get(':id')
