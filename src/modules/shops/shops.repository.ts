@@ -46,7 +46,7 @@ export class ShopsRepository {
     return result;
   }
 
-  async delete(id: string): Promise<void> {
-    await this.shopModel.destroy({ where: { id } });
+  async delete(id: string): Promise<number> {
+    return this.shopModel.destroy({ where: { id } });
   }
 }

@@ -25,5 +25,13 @@ export class UpdateShopDTO {
     })
   )
   closingHour?: Date;
+  @JoiSchema(
+  Joi.string()
+    .valid('OPEN', 'CLOSED')
+    .optional()
+    .messages({
+      'any.only': 'Availability must be OPEN or CLOSED',
+      'string.base': 'Availability must be a string',
+    }))
   availability?: string;
 }

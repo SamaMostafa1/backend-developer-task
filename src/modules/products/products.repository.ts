@@ -19,11 +19,11 @@ export class ProductsRepository {
     where: WhereOptions<Product>,
     limit?: number,
     offset?: number,
-  ): Promise<Product[]> {
+  ): Promise<{rows: Product[]; count: number }> {
     const queryOptions: FindOptions<Product> = { where };
     if (limit) queryOptions.limit = limit;
     if (offset) queryOptions.offset = offset;
-    return this.productModel.findAll(queryOptions);
+    return this.productModel.findAndCountAll(queryOptions);
   }
 
   async update(id: string, product: Partial<Product>): Promise<[number, Product[]]> {

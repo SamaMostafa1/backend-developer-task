@@ -54,13 +54,26 @@ describe('ProductsController', () => {
   });
 
   it('lists products using query params', async () => {
-    const query = { search: 'app', page: 1, limit: 20 };
-    service.findProducts.mockResolvedValue([product] as any);
+  const query = { search: 'app', page: 1, limit: 20 };
 
-    await expect(controller.findProducts(query)).resolves.toEqual([product]);
-    expect(service.findProducts).toHaveBeenCalledWith(query);
+  service.findProducts.mockResolvedValue({
+    data: [product],
+    total: 1,
+    page: 1,
+    limit: 20,
+    totalPages: 1,
+  } as any);
+
+  await expect(controller.findProducts(query)).resolves.toEqual({
+    data: [product],
+    total: 1,
+    page: 1,
+    limit: 20,
+    totalPages: 1,
   });
 
+  expect(service.findProducts).toHaveBeenCalledWith(query);
+});
   it('fetches a product by id', async () => {
     service.findOne.mockResolvedValue(product as any);
 

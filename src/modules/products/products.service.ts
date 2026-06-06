@@ -11,6 +11,7 @@ import { CreateProductDTO } from './dto/create-product.dto';
 import { Op, WhereOptions } from 'sequelize';
 import { updateProductDTO } from './dto/update-product.dto';
 import { ProductQueryDto } from './dto/product-query.dto';
+import { PaginatedResponse } from 'src/common/interfaces/pagination-respones.interface';
 
 @Injectable()
 export class ProductsService {
@@ -34,8 +35,8 @@ export class ProductsService {
       ...filter,
     };
     try {
-      const products = await this.repository.findWithFilter(where);
-      this.logger.debug(`Found ${products.length} products`, 'ProductsService');
+       const { rows: products,count}  = await this.repository.findWithFilter(where);
+      this.logger.debug(`Found ${count} products`, 'ProductsService');
       return products;
     } catch (error: any) {
       this.logger.error('Error finding products', error, 'ProductsService');
@@ -48,32 +49,44 @@ export class ProductsService {
    * - page: a number to specify the page of results to return (default is 1)
    * - limit: a number to specify the number of results per page (default is 20)
    */
+async findProducts(
+  query: ProductQueryDto,
+): Promise<PaginatedResponse<ProductDTO>> {
+  const page = query.page ?? 1;
+  const limit = query.limit ?? 20;
+  const offset = (page - 1) * limit;
 
-  async findProducts(query: ProductQueryDto) {
-    const page = query.page ?? 1;
-    const limit = query.limit ?? 20;
-    const offset = (page - 1) * limit;
-    const where: WhereOptions<ProductDTO> = {};
+  const where: WhereOptions<ProductDTO> = {};
 
-    if (query.search) {
-      where.name = {
-        [Op.iLike]: `%${query.search}%`,
-      };
-    }
-    try {
-      const products = await this.repository.findWithFilter(
-        where,
-        limit,
-        offset,
-      );
-      this.logger.debug(`Found ${products.length} products`, 'ProductsService');
-      return products;
-    } catch (error: any) {
-      this.logger.error('Error finding products', error, 'ProductsService');
-      throw error;
-    }
+  if (query.search) {
+    where.name = {
+      [Op.iLike]: `%${query.search}%`,
+    };
   }
 
+  try {
+    const { rows: products, count } =
+      await this.repository.findWithFilter(where, limit, offset);
+
+    const totalPages = Math.ceil(count / limit);
+
+    this.logger.debug(
+      `Found ${count} products,`,
+      'ProductsService',
+    );
+
+    return {
+      data: products,
+      total: count,
+      page,
+      limit,
+      totalPages,
+    };
+  } catch (error:any) {
+    this.logger.error('Error finding products', error, 'ProductsService');
+    throw error;
+  }
+}
   /**
    * This method finds a single product by its ID.
    * @param id The ID of the product to find

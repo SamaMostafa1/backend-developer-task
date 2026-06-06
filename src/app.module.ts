@@ -9,7 +9,8 @@ import { ShopsModule } from './modules/shops/shops.module';
 import { JoiPipeModule } from 'nestjs-joi';
 import { LoggerModule } from './common/logger/logger.module';
 import { CacheModule } from '@nestjs/cache-manager';
-import * as redisStore from 'cache-manager-redis-store';
+// import * as redisStore from 'cache-manager-redis-store';
+import { createKeyv } from '@keyv/redis';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -33,10 +34,18 @@ import * as redisStore from 'cache-manager-redis-store';
         },
       },
     }),
-    CacheModule.register({
+    CacheModule.registerAsync({
       isGlobal: true,
-      store: redisStore,
-      url: process.env.REDIS_URL,
+      inject: [ConfigService],
+      useFactory: async (config: ConfigService) => {
+        const redis_url =
+          config.get<string>('REDIS_URL');
+        return {
+          stores: [
+            createKeyv(redis_url),
+          ],
+        };
+      },
     }),
     MembersModule,
     ProductsModule,

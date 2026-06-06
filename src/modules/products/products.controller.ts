@@ -6,6 +6,7 @@ import { ProductDTO } from './dto/product.dto';
 import { AppLogger } from 'src/common/logger/logger';
 import { ProductQueryDto } from './dto/product-query.dto';
 import { updateProductDTO } from './dto/update-product.dto';
+import { PaginatedResponse } from 'src/common/interfaces/pagination-respones.interface';
 
 @Controller('products')
 export class ProductsController {
@@ -17,7 +18,7 @@ export class ProductsController {
         return this.productsService.create(createProductDto);
       }
       @Get()
-      async findProducts(@Query() query: ProductQueryDto): Promise<ProductDTO[]> {
+      async findProducts(@Query() query: ProductQueryDto): Promise<PaginatedResponse<ProductDTO>>{
         return this.productsService.findProducts(query);
       }
       @Get(':id')

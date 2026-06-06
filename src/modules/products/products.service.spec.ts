@@ -85,18 +85,27 @@ describe('ProductsService', () => {
   });
 
   it('lists products with case-insensitive search and pagination', async () => {
-    repository.findWithFilter.mockResolvedValue([product] as any);
+  repository.findWithFilter.mockResolvedValue({
+    rows: [product],
+    count: 1,
+  } as any);
 
-    await expect(
-      service.findProducts({ search: 'app', page: 2, limit: 5 }),
-    ).resolves.toEqual([product]);
-
-    expect(repository.findWithFilter).toHaveBeenCalledWith(
-      { name: { [Op.iLike]: '%app%' } },
-      5,
-      5,
-    );
+  await expect(
+    service.findProducts({ search: 'app', page: 2, limit: 5 }),
+  ).resolves.toEqual({
+    data: [product],
+    total: 1,
+    page: 2,
+    limit: 5,
+    totalPages: 1,
   });
+
+  expect(repository.findWithFilter).toHaveBeenCalledWith(
+    { name: { [Op.iLike]: '%app%' } },
+    5,
+    5,
+  );
+});
   it('throws error when repository fails to find products', async () => {
     repository.findWithFilter.mockRejectedValue(new Error('DB error'));
 

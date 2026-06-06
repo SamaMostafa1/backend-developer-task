@@ -105,7 +105,7 @@ export class MembersService {
       const member =await this.repository.findOne(id);
       if (!member) {
         this.logger.warn(
-          `Member with ID: ${id} not found for update`,
+          `Member with ID: ${id} not found `,
           'MembersService',
         );
         throw new NotFoundException('Member not found');

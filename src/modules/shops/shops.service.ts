@@ -17,7 +17,10 @@ export class ShopsService {
   async create(shop: CreateShopDTO): Promise<ShopDTO> {
     try {
       const createdShop = await this.repository.create(shop);
-      this.logger.debug(`Created shop with ID: ${createdShop.id}`, 'ShopsService');
+      this.logger.debug(
+        `Created shop with ID: ${createdShop.id}`,
+        'ShopsService',
+      );
       return createdShop;
     } catch (error: any) {
       this.logger.error('Error creating shop', error, 'ShopsService');
@@ -26,7 +29,7 @@ export class ShopsService {
   }
 
   async findAll(): Promise<ShopDTO[]> {
-    try {      
+    try {
       const shops = await this.repository.findAll();
       this.logger.debug(`Found ${shops.length} shops`, 'ShopsService');
       return shops;
@@ -34,7 +37,6 @@ export class ShopsService {
       this.logger.error('Error finding shops', error, 'ShopsService');
       throw error;
     }
-    
   }
 
   /**
@@ -44,10 +46,17 @@ export class ShopsService {
   async findAllWithProducts(): Promise<ShopWithProductsDTO[]> {
     try {
       const shops = await this.repository.findAllWithProducts();
-      this.logger.debug(`Found ${shops.length} shops with products`, 'ShopsService');
+      this.logger.debug(
+        `Found ${shops.length} shops with products`,
+        'ShopsService',
+      );
       return shops;
     } catch (error: any) {
-      this.logger.error('Error finding shops with products', error, 'ShopsService');
+      this.logger.error(
+        'Error finding shops with products',
+        error,
+        'ShopsService',
+      );
       throw error;
     }
   }
@@ -55,11 +64,12 @@ export class ShopsService {
   async findOne(id: string): Promise<ShopDTO> {
     try {
       const shop = await this.repository.findOne(id);
-      this.logger.debug(`Found shop with ID: ${id}`, 'ShopsService');
+      
       if (!shop) {
         this.logger.warn(`Shop with ID: ${id} not found`, 'ShopsService');
         throw new NotFoundException('Shop not found');
       }
+      this.logger.debug(`Found shop with ID: ${id}`, 'ShopsService');
       return shop;
     } catch (error: any) {
       this.logger.error('Error finding shop', error, 'ShopsService');
@@ -69,9 +79,15 @@ export class ShopsService {
 
   async update(id: string, shop: UpdateShopDTO): Promise<ShopDTO> {
     try {
-      const [affectedRows, updatedShop] = await this.repository.update(id, shop);
+      const [affectedRows, updatedShop] = await this.repository.update(
+        id,
+        shop,
+      );
       if (affectedRows === 0) {
-        this.logger.warn(`Shop with ID: ${id} not found for update`, 'ShopsService');
+        this.logger.warn(
+          `Shop with ID: ${id} not found for update`,
+          'ShopsService',
+        );
         throw new NotFoundException('Shop not found');
       }
       this.logger.debug(`Updated shop with ID: ${id}`, 'ShopsService');
@@ -84,7 +100,10 @@ export class ShopsService {
 
   async delete(id: string) {
     try {
-      await this.repository.delete(id);
+      const deletedRow= await this.repository.delete(id);
+      if (deletedRow === 0) {
+        throw new NotFoundException(`Shop with ID ${id} not found`);
+      }
       this.logger.debug(`Deleted shop with ID: ${id}`, 'ShopsService');
     } catch (error: any) {
       this.logger.error('Error deleting shop', error, 'ShopsService');
