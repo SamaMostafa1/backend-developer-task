@@ -13,11 +13,11 @@ export class CreateProductDTO {
   shopId: string;
 
   @JoiSchema(
-    Joi.string().trim().min(3).max(1000).required().messages({
+    Joi.string().trim().min(3).max(250).required().messages({
       'string.base': 'Name must be a string',
       'string.empty': 'Name cannot be empty',
       'string.min': 'Name must be at least 3 characters',
-      'string.max': 'Name must be at most 1000 characters',
+      'string.max': 'Name must be at most 250 characters',
       'any.required': 'Name is required',
     }),
   )

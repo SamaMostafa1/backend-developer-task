@@ -153,12 +153,20 @@ export class ProductsService {
       throw error;
     }
   }
+  
   /**
-   * This method deducts stock from a product. It first checks if the product exists, and if it does, it deducts the stock. If the product does not exist, it throws a NotFoundException.
-   * @param productId The ID of the product to deduct stock from
-   *  @param amount The amount of stock to deduct
-   * @return void
-   * @throws NotFoundException if the product does not exist
+    * ASSUMPTION: The update product  was unclear
+    * whether it should handle general updates (name, price, description) or
+    * stock deduction (when a member uses/purchases a product).
+    * Decided to separate concerns into two distinct operations:
+    * 1. updateProduct() — general updates (name, price, description, etc.)
+    * 2. deductStock()
+    *************************************************************
+    * This method deducts stock from a product. It first checks if the product exists, and if it does, it deducts the stock. If the product does not exist, it throws a NotFoundException.
+    * @param productId The ID of the product to deduct stock from
+    *  @param amount The amount of stock to deduct
+    * @return void
+    * @throws NotFoundException if the product does not exist
    */
   async deductStock(productId: string, amount: number) {
     try {

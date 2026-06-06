@@ -77,6 +77,13 @@ describe('ProductsService', () => {
     expect(repository.create).not.toHaveBeenCalled();
   });
 
+  it('throws error when repository fails to create a product', async () => {
+    shopsService.findOne.mockResolvedValue({ id: product.shopId } as any);
+    repository.create.mockRejectedValue(new Error('DB error'));
+
+    await expect(service.create(product)).rejects.toThrow('DB error');
+  });
+
   it('lists products with case-insensitive search and pagination', async () => {
     repository.findWithFilter.mockResolvedValue([product] as any);
 
@@ -89,6 +96,13 @@ describe('ProductsService', () => {
       5,
       5,
     );
+  });
+  it('throws error when repository fails to find products', async () => {
+    repository.findWithFilter.mockRejectedValue(new Error('DB error'));
+
+    await expect(
+      service.findProducts({ search: 'app', page: 2, limit: 5 }),
+    ).rejects.toThrow('DB error');
   });
 
   it('returns a product by id', async () => {
@@ -104,7 +118,11 @@ describe('ProductsService', () => {
       NotFoundException,
     );
   });
+  it('throws error when repository fails to find product by id', async () => {
+    repository.findOne.mockRejectedValue(new Error('DB error'));
 
+    await expect(service.findOne(product.id)).rejects.toThrow('DB error');
+  });
   it('updates a product and validates a new shop id', async () => {
     const newShopId = '07c071e7-9d89-4cf5-a9df-e99484e6fda7';
     const updatedProduct = { ...product, shopId: newShopId };
@@ -120,7 +138,7 @@ describe('ProductsService', () => {
       shopId: newShopId,
     });
   });
-  it ('throws when updating a product with a missing shop id', async () => {
+  it('throws when updating a product with a missing shop id', async () => {
     const newShopId = '07c071e7-9d89-4cf5-a9df-e99484e6fda7';
     shopsService.findOne.mockResolvedValue(null as any);
 
@@ -130,7 +148,6 @@ describe('ProductsService', () => {
 
     expect(shopsService.findOne).toHaveBeenCalledWith(newShopId);
     expect(repository.update).not.toHaveBeenCalled();
-    
   });
 
   it('throws when update target product does not exist', async () => {
@@ -140,8 +157,15 @@ describe('ProductsService', () => {
       service.update(product.id, { name: 'New name' }),
     ).rejects.toBeInstanceOf(NotFoundException);
     expect(repository.update).toHaveBeenCalledWith(product.id, {
-  name: 'New name',
-});
+      name: 'New name',
+    });
+  });
+  it('throws error when repository fails to update product', async () => {
+    repository.update.mockRejectedValue(new Error('DB error'));
+
+    await expect(
+      service.update(product.id, { name: 'New name' }),
+    ).rejects.toThrow('DB error');
   });
 
   it('deducts stock with ', async () => {
@@ -168,10 +192,18 @@ describe('ProductsService', () => {
     );
   });
 
+  it('throws error when repository fails to deduct stock', async () => {
+    repository.changeStock.mockRejectedValue(new Error('DB error'));
+
+    await expect(service.deductStock(product.id, 3)).rejects.toThrow(
+      'DB error',
+    );
+  });
+
   it('deletes an existing product', async () => {
     repository.delete.mockResolvedValue(1);
     await expect(service.delete(product.id)).resolves.toBeUndefined();
-     expect(repository.delete).toHaveBeenCalledWith(product.id);
+    expect(repository.delete).toHaveBeenCalledWith(product.id);
   });
 
   it('throws when deleting a missing product', async () => {
@@ -180,6 +212,11 @@ describe('ProductsService', () => {
     await expect(service.delete(product.id)).rejects.toBeInstanceOf(
       NotFoundException,
     );
-      expect(repository.delete).toHaveBeenCalledWith(product.id);
+    expect(repository.delete).toHaveBeenCalledWith(product.id);
+  });
+  it('throws error when repository fails to delete product', async () => {
+    repository.delete.mockRejectedValue(new Error('DB error'));
+
+    await expect(service.delete(product.id)).rejects.toThrow('DB error');
   });
 });
