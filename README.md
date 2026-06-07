@@ -88,6 +88,7 @@ npm install
 
 - Copy `.env.example` to `.env`
 - Set `DATABASE_URL`
+- Note: after adding redis need to set REDIS_URL
 
 1. Run the server:
 
